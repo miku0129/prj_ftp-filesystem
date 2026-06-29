@@ -2,8 +2,8 @@ FROM mcr.microsoft.com/devcontainers/php:8.4
 
 WORKDIR /var/www/html
 
-RUN docker-php-ext-install mysqli pdo pdo_mysql
-RUN docker-php-ext-enable mysqli
+RUN docker-php-ext-install ftp
+RUN docker-php-ext-enable ftp
 
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.5/install.sh | bash
 RUN \. "/usr/local/share/nvm/nvm.sh" && nvm install 26 && nvm use 26
