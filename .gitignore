@@ -5,4 +5,6 @@ node_modules
 /php/src/public
 /php/src/public/*
 
-text
+text.txt
+helloworld.txt
+helloworld_downloaded_file.txt
