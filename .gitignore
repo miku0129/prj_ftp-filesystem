@@ -6,5 +6,4 @@ node_modules
 /php/src/public/*
 
 text.txt
-helloworld.txt
-helloworld_downloaded_file.txt
+downloads/
