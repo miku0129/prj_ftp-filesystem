@@ -6,7 +6,7 @@ if (isset($_POST['upload_submit'])) {
     $remote_file = $_FILES['file']['name']; // Get the original file name
 
     // Upload file
-    if (ftp_put($conn_id, $remote_file, $local_file, FTP_ASCII)) {
+    if (ftp_put($conn_id, $remote_file, $local_file, FTP_BINARY)) {
         header('Location: /');
     } else {
         echo "Error uploading $local_file\n";
