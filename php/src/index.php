@@ -93,11 +93,11 @@ if (isset($_POST['upload_submit_folder'])) {
         </form>
 
         <div class="overflow-auto py-3 mt-8">
-            <p class="text-lg text-blue-500">My files</p>
+            <p class="text-lg text-blue-500">My contents</p>
             <table class="table-auto">
                 <thead>
                     <tr>
-                        <th class="border border-blue-500 px-4 py-2 text-blue-500">File Name</th>
+                        <th class="border border-blue-500 px-4 py-2 text-blue-500">Name</th>
                         <th class="border border-blue-500 px-4 py-2 text-blue-500">Download</th>
                         <th class="border border-blue-500 px-4 py-2 text-blue-500">Delete</th>
                     </tr>
@@ -105,16 +105,16 @@ if (isset($_POST['upload_submit_folder'])) {
                 <tbody>
 
                     <?php
-                    $files = ftp_nlist($conn_id, ".");
+                    $contents = ftp_nlist($conn_id, ".");
 
-                    if ($files) {
+                    if ($contents) {
 
 
-                        for ($i = 0; $i < count($files); $i++) {
+                        for ($i = 0; $i < count($contents); $i++) {
                             echo '<tr>
-                                    <td class="border border-blue-500 px-4 py-2 font-medium">' . $files[$i] . '</td>
-                                    <td class="border border-blue-500 px-4 py-2 font-medium"><a class="text-blue-700 underline px-4 py-2 block" href="./download.php?download_file=' . $files[$i] . '" target="__blank">Download</a></td>
-                                    <td class="border border-blue-500 px-4 py-2 font-medium"><a class="text-blue-700 underline px-4 py-2 block" href="./delete.php?delete_file=' . $files[$i] . '">Delete</a></td>
+                                    <td class="border border-blue-500 px-4 py-2 font-medium">' . $contents[$i] . '</td>
+                                    <td class="border border-blue-500 px-4 py-2 font-medium"><a class="text-blue-700 underline px-4 py-2 block" href="./download.php?download_content=' . $contents[$i] . '" target="__blank">Download</a></td>
+                                    <td class="border border-blue-500 px-4 py-2 font-medium"><a class="text-blue-700 underline px-4 py-2 block" href="./delete.php?delete_content=' . $contents[$i] . '">Delete</a></td>
                                 </tr>';
                         }
                     }
