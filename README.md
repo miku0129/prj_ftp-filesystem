@@ -2,7 +2,6 @@
 
 This is a sample ftp file management application built for learning purposes.
 
-
 ## Pre-Requisites
 
 - Docker
@@ -13,6 +12,12 @@ This is a sample ftp file management application built for learning purposes.
 1. Open devcontainer in VSCode
 2. Access http://localhost in a browser
 3. Excute `npm run build:css` for styling
+
+## To connect FTP server from FTP Client
+    - host: `127.0.0.1`
+    - user: `user`
+    - password: `pass`
+    - port: `21`
 
 ## Referenced links
 
