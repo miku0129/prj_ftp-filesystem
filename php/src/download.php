@@ -13,16 +13,16 @@ function isFile($content)
 function getzip($ftp, $content, $dldir)
 {
 
-    function ftp_getzip($ftp, $content, $dldir) 
+    function ftp_getzip($ftp, $content, $dldir) // function to get content from FTP server
     {
 
-        $lists = ftp_nlist($ftp, $content);
-        $dir_name = $dldir;
+        $lists = ftp_nlist($ftp, $content); // get a list of files in ftp server
+        $dir_name = $dldir; // temporarily directory name for content to store in PHP app
 
         foreach ($lists as $list) {
 
-            $content_dir = explode('/', $list)[0];
-            $dir_name = (basename($dir_name)) !==  $content_dir ? $dir_name . $content_dir : $dir_name;
+            $content_dir = explode('/', $list)[0]; // because format of the list is like 'hoge/sample.pdf' or 'hoge/huga/'
+            $dir_name = (basename($dir_name)) !==  $content_dir ? $dir_name . $content_dir : $dir_name; // if content_dir not exist in current dir_name, update dir_name 
 
             if (!file_exists($dir_name) && !is_dir($dir_name)) {
                 mkdir($dir_name);
@@ -41,28 +41,26 @@ function getzip($ftp, $content, $dldir)
             }
 
             if (!$is_file) {
-                $next_dir = explode('/', $list)[1];
-                $dir_name = $dir_name . "/" . $next_dir;
+                $content_chdir = explode('/', $list)[1];
+                $dir_name = $dir_name . "/" . $content_chdir; // update dir_name
 
                 if (!file_exists($dir_name) && !is_dir($dir_name)) {
 
                     mkdir($dir_name);
                 }
-                ftp_chdir($ftp, explode('/', $list)[0]);
-                ftp_getzip($ftp, $next_dir, $dir_name);
+                ftp_chdir($ftp, $content_dir); // go into one directory down in FTP server
+                ftp_getzip($ftp, $content_chdir, $dir_name);
             }
         }
         return true;
     }
     ftp_getzip($ftp, $content, $dldir);
 
-    $zip_filepath = "../../downloads/" . $content;
-    $path = explode("/", $zip_filepath);
-    $zip_filename = end($path) . ".zip";
+    $zip_filename = $content . ".zip";
+    $zip_filepath = "../../downloads" . "/" . $zip_filename;
 
-    $command = 'cd ' . "../../downloads" . ";" . "zip -r " . $zip_filename . " " . end($path);
+    $command = 'cd ' . "../../downloads" . ";" . "zip -r " . $zip_filename . " " . $content;
     exec($command);
-
 
     if (ob_get_level() > 0) {
         ob_end_clean();
@@ -71,11 +69,9 @@ function getzip($ftp, $content, $dldir)
     header("Content-Type: application/zip");
     header("Content-Transfer-Encoding: Binary");
     header("Content-Disposition: attachment; filename=\"" . $zip_filename . "\"");
-    header('Content-Length: ' . filesize('../../downloads/' . $zip_filename));
+    header('Content-Length: ' . filesize($zip_filepath));
 
-    readfile('../../downloads/' . $zip_filename);
-
-    // unlink($zip_filepath . ".zip");
+    readfile($zip_filepath);
     exit();
 }
 
