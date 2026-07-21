@@ -10,15 +10,18 @@ function isFile($content)
     return str_contains($content, '.');
 }
 
-function ftp_getzip($ftp, $content, $dldir) // function to get content from FTP server
+function ftp_getzip($ftp, $content, $dldir)
 {
-    $lists = ftp_nlist($ftp, $content); // get a list of files in ftp server
-    $dir_name = $dldir; // temporarily directory name for content to store in PHP app
+    $lists = ftp_nlist($ftp, $content); // get a list of files/directories under given directory in ftp server
+    $dir_name = $dldir; // temporarily directory name for downloading
 
     foreach ($lists as $list) {
 
-        $content_dir = explode('/', $list)[0]; // because format of the list is like 'hoge/sample.pdf' or 'hoge/huga/'
-        $dir_name = (basename($dir_name)) !==  $content_dir ? $dir_name . $content_dir : $dir_name; // if content_dir not exist in current dir_name, update dir_name 
+        $list_first_half = explode('/', $list)[0]; // $list is formatted like, 'hoge/sample.pdf' or 'hoge/huga/'
+        $list_second_half = explode('/', $list)[1];
+
+        // check current $dir_name, then update with directory of content
+        $dir_name = (basename($dir_name)) !==  $list_first_half ? $dir_name . $list_first_half : $dir_name;
 
         if (!file_exists($dir_name) && !is_dir($dir_name)) {
             mkdir($dir_name);
@@ -27,25 +30,27 @@ function ftp_getzip($ftp, $content, $dldir) // function to get content from FTP 
         $is_file = isFile($list);
 
         if ($is_file) {
-            $file_name = explode('/', $list)[1];
 
-            $local_file_path = $dir_name . '/' . $file_name;
-            $remote_file_path = ftp_pwd($ftp) . '/' . $list;
+            $local_file_path = $dir_name . '/' . $list_second_half;
+
+            $file_path_if_pwd_root = ftp_pwd($ftp) . $list;
+            $file_path_if_pwd_isnt_root = ftp_pwd($ftp) . '/' . $list;
+            $remote_file_path = ftp_pwd($ftp) !== '/' ? $file_path_if_pwd_isnt_root : $file_path_if_pwd_root;
 
             ftp_get($ftp, $local_file_path, $remote_file_path, FTP_BINARY);
         }
 
         if (!$is_file) {
-            $content_chdir = explode('/', $list)[1];
+
             $copy_dir_name = $dir_name;
-            $dir_name = $dir_name . "/" . $content_chdir; // update dir_name
+            $dir_name = $dir_name . "/" . $list_second_half; // update dir_name
 
             if (!file_exists($dir_name) && !is_dir($dir_name)) {
 
                 mkdir($dir_name);
             }
-            ftp_chdir($ftp, $content_dir); // go into one directory down in FTP server
-            ftp_getzip($ftp, $content_chdir, $dir_name);
+            ftp_chdir($ftp, $list_first_half); // go into one directory down in FTP server
+            ftp_getzip($ftp, $list_second_half, $dir_name);
 
             ftp_chdir($ftp, '../'); // reset position in ftp server
             $dir_name = $copy_dir_name; //reset dir_name
