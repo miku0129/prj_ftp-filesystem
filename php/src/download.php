@@ -12,7 +12,6 @@ function isFile($content)
 
 function ftp_getzip($ftp, $content, $dldir) // function to get content from FTP server
 {
-
     $lists = ftp_nlist($ftp, $content); // get a list of files in ftp server
     $dir_name = $dldir; // temporarily directory name for content to store in PHP app
 
@@ -30,15 +29,15 @@ function ftp_getzip($ftp, $content, $dldir) // function to get content from FTP 
         if ($is_file) {
             $file_name = explode('/', $list)[1];
 
-            $local_file_path = $dir_name . "/" . $file_name;
-
-            $remote_file_path = ftp_pwd($ftp) . "/" . $list;
+            $local_file_path = $dir_name . '/' . $file_name;
+            $remote_file_path = ftp_pwd($ftp) . '/' . $list;
 
             ftp_get($ftp, $local_file_path, $remote_file_path, FTP_BINARY);
         }
 
         if (!$is_file) {
             $content_chdir = explode('/', $list)[1];
+            $copy_dir_name = $dir_name;
             $dir_name = $dir_name . "/" . $content_chdir; // update dir_name
 
             if (!file_exists($dir_name) && !is_dir($dir_name)) {
@@ -47,6 +46,9 @@ function ftp_getzip($ftp, $content, $dldir) // function to get content from FTP 
             }
             ftp_chdir($ftp, $content_dir); // go into one directory down in FTP server
             ftp_getzip($ftp, $content_chdir, $dir_name);
+
+            ftp_chdir($ftp, '../'); // reset position in ftp server
+            $dir_name = $copy_dir_name; //reset dir_name
         }
     }
     return true;
