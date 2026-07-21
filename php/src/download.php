@@ -10,50 +10,70 @@ function isFile($content)
     return str_contains($content, '.');
 }
 
-function getzip($ftp, $content, $dldir)
+function ftp_getzip($ftp, $content, $dldir) // function to get content from FTP server
 {
 
-    function ftp_getzip($ftp, $content, $dldir) // function to get content from FTP server
-    {
+    $lists = ftp_nlist($ftp, $content); // get a list of files in ftp server
+    $dir_name = $dldir; // temporarily directory name for content to store in PHP app
 
-        $lists = ftp_nlist($ftp, $content); // get a list of files in ftp server
-        $dir_name = $dldir; // temporarily directory name for content to store in PHP app
+    foreach ($lists as $list) {
 
-        foreach ($lists as $list) {
+        $content_dir = explode('/', $list)[0]; // because format of the list is like 'hoge/sample.pdf' or 'hoge/huga/'
+        $dir_name = (basename($dir_name)) !==  $content_dir ? $dir_name . $content_dir : $dir_name; // if content_dir not exist in current dir_name, update dir_name 
 
-            $content_dir = explode('/', $list)[0]; // because format of the list is like 'hoge/sample.pdf' or 'hoge/huga/'
-            $dir_name = (basename($dir_name)) !==  $content_dir ? $dir_name . $content_dir : $dir_name; // if content_dir not exist in current dir_name, update dir_name 
+        if (!file_exists($dir_name) && !is_dir($dir_name)) {
+            mkdir($dir_name);
+        }
+
+        $is_file = isFile($list);
+
+        if ($is_file) {
+            $file_name = explode('/', $list)[1];
+
+            $local_file_path = $dir_name . "/" . $file_name;
+
+            $remote_file_path = ftp_pwd($ftp) . "/" . $list;
+
+            ftp_get($ftp, $local_file_path, $remote_file_path, FTP_BINARY);
+        }
+
+        if (!$is_file) {
+            $content_chdir = explode('/', $list)[1];
+            $dir_name = $dir_name . "/" . $content_chdir; // update dir_name
 
             if (!file_exists($dir_name) && !is_dir($dir_name)) {
+
                 mkdir($dir_name);
             }
-
-            $is_file = isFile($list);
-
-            if ($is_file) {
-                $file_name = explode('/', $list)[1];
-
-                $local_file_path = $dir_name . "/" . $file_name;
-
-                $remote_file_path = ftp_pwd($ftp) . "/" . $list;
-
-                ftp_get($ftp, $local_file_path, $remote_file_path, FTP_BINARY);
-            }
-
-            if (!$is_file) {
-                $content_chdir = explode('/', $list)[1];
-                $dir_name = $dir_name . "/" . $content_chdir; // update dir_name
-
-                if (!file_exists($dir_name) && !is_dir($dir_name)) {
-
-                    mkdir($dir_name);
-                }
-                ftp_chdir($ftp, $content_dir); // go into one directory down in FTP server
-                ftp_getzip($ftp, $content_chdir, $dir_name);
-            }
+            ftp_chdir($ftp, $content_dir); // go into one directory down in FTP server
+            ftp_getzip($ftp, $content_chdir, $dir_name);
         }
-        return true;
     }
+    return true;
+}
+
+function rrmdir($del_content_path) // function to delete temporarily downloaded content
+{
+    $lists = scandir($del_content_path);
+
+    foreach ($lists as $list) {
+        $isFile = isFile($list);
+
+        if ($isFile & $list !== '.' & $list !== '..') {
+            unlink($del_content_path . "/" . $list);
+        }
+
+        if (!$isFile) {
+            $nextDir = $del_content_path . "/" . $list;
+            rrmdir($nextDir);
+        }
+    }
+    rmdir($del_content_path); // delete empty directory
+    return;
+}
+
+function getzip($ftp, $content, $dldir)
+{
     ftp_getzip($ftp, $content, $dldir);
 
     $zip_filename = $content . ".zip";
@@ -61,6 +81,8 @@ function getzip($ftp, $content, $dldir)
 
     $command = 'cd ' . "../../downloads" . ";" . "zip -r " . $zip_filename . " " . $content;
     exec($command);
+
+    rrmdir($dldir . $content); // delete downloaded content
 
     if (ob_get_level() > 0) {
         ob_end_clean();
@@ -72,6 +94,7 @@ function getzip($ftp, $content, $dldir)
     header('Content-Length: ' . filesize($zip_filepath));
 
     readfile($zip_filepath);
+    unlink($zip_filepath); // delete zip file
     exit();
 }
 
