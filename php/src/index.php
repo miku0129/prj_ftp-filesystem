@@ -112,7 +112,7 @@ if (isset($_POST['upload_submit_folder'])) {
 
                         for ($i = 0; $i < count($contents); $i++) {
                             echo '<tr>
-                                    <td class="border border-blue-500 px-4 py-2 font-medium">' . $contents[$i] . '</td>
+                                    <td class="border border-blue-500 px-4 py-2 font-medium"><a class="text-blue-700 underline px-4 py-2 block" href="./content.php?path=' . $contents[$i] . '">"' . $contents[$i] . '"</a></td>
                                     <td class="border border-blue-500 px-4 py-2 font-medium"><a class="text-blue-700 underline px-4 py-2 block" href="./download.php?download_content=' . $contents[$i] . '" target="__blank">Download</a></td>
                                     <td class="border border-blue-500 px-4 py-2 font-medium"><a class="text-blue-700 underline px-4 py-2 block" href="./delete.php?delete_content=' . $contents[$i] . '">Delete</a></td>
                                 </tr>';
