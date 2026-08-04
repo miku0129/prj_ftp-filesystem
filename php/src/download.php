@@ -15,6 +15,10 @@ function ftp_getzip($ftp, $content, $dldir)
     $lists = ftp_nlist($ftp, $content); // get a list of files/directories under given directory in ftp server
     $dir_name = $dldir; // temporarily directory name for downloading
 
+    if (!file_exists($dldir) && !is_dir($dldir)) { // if download directory doesn't exist, create it
+        mkdir($dldir);
+    }
+
     foreach ($lists as $list) {
 
         $list_first_half = explode('/', $list)[0]; // $list is formatted like, 'hoge/sample.pdf' or 'hoge/huga/'
@@ -89,7 +93,7 @@ function getzip($ftp, $content, $dldir)
     $command = 'cd ' . "../../downloads" . ";" . "zip -r " . $zip_filename . " " . $content;
     exec($command);
 
-    rrmdir($dldir . $content); // delete downloaded content
+    rrmdir($dldir); // delete downloaded content
 
     if (ob_get_level() > 0) {
         ob_end_clean();
@@ -121,6 +125,7 @@ if ($is_file) { // if content is a file
             header('Content-Disposition: attachment; filename="' . basename($content_name)  . '"');
             readfile($content_name, true);
         }
+        rrmdir($download_dir); // delete downloaded content
     } else {
         echo "could not download $content_name\n";
     }
