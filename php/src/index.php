@@ -1,5 +1,6 @@
 <?php
-include('connectftp.php');
+include 'connectftp.php';
+include 'lib.php';
 
 if (isset($_POST['upload_submit_file'])) {
     $remote_filename = $_FILES['file']["tmp_name"]; // Get the temporary file path
@@ -105,12 +106,19 @@ if (isset($_POST['upload_submit_folder'])) {
                 <tbody>
 
                     <?php
-                    $contents = ftp_nlist($conn_id, ".");
+                    $contents = ftp_rawlist($conn_id, ".");
 
                     if ($contents) {
-
-
                         for ($i = 0; $i < count($contents); $i++) {
+                            $isDirectory = ftp_is_directory($contents[$i]);
+                            $contentName = ftp_get_content_name($contents[$i]);
+
+                            if ($isDirectory) {
+                                $contents[$i] = $contentName . '/'; // Append a forward slash to indicate it's a directory
+                            } else {
+                                $contents[$i] = $contentName; // It's a file, keep the name as is
+                            }
+
                             echo '<tr>
                                     <td class="border border-blue-500 px-4 py-2 font-medium"><a class="text-blue-700 underline px-4 py-2 block" href="./content.php?path=' . $contents[$i] . '">"' . $contents[$i] . '"</a></td>
                                     <td class="border border-blue-500 px-4 py-2 font-medium"><a class="text-blue-700 underline px-4 py-2 block" href="./download.php?download_content=' . $contents[$i] . '" target="__blank">Download</a></td>

@@ -1,63 +1,42 @@
 <?php
-include('connectftp.php');
+include 'connectftp.php';
+include 'lib.php';
 
 $content_name = filter_input(INPUT_GET, 'download_content', FILTER_UNSAFE_RAW);
-$download_dir = '../../downloads/';
-$download_file = $download_dir . $content_name; // Specify the local path to save the downloaded file
-
-function isFile($content)
-{
-    return str_contains($content, '.');
-}
+$download_dir = '../../downloads';
 
 function ftp_getzip($ftp, $content, $dldir)
 {
-    $lists = ftp_nlist($ftp, $content); // get a list of files/directories under given directory in ftp server
-    $dir_name = $dldir; // temporarily directory name for downloading
+    $items = ftp_rawlist($ftp, $content); // get a list of files/directories under given directory in ftp server
 
-    if (!file_exists($dldir) && !is_dir($dldir)) { // if download directory doesn't exist, create it
-        mkdir($dldir);
+    $dir_name = $dldir; // temporarily directory name for downloading
+    if (!file_exists($dir_name) && !is_dir($dir_name)) { // if download directory doesn't exist, create it
+        mkdir($dir_name);
     }
 
-    foreach ($lists as $list) {
+    foreach ($items as $item) {
+        $isDirectory = ftp_is_directory($item);
 
-        $list_first_half = explode('/', $list)[0]; // $list is formatted like, 'hoge/sample.pdf' or 'hoge/huga/'
-        $list_second_half = explode('/', $list)[1];
+        if (!$isDirectory) { // if content is a file, download it
 
-        // check current $dir_name, then update with directory of content
-        $dir_name = (basename($dir_name)) !==  $list_first_half ? $dir_name . $list_first_half : $dir_name;
+            $content_name = ftp_get_content_name($item);
 
-        if (!file_exists($dir_name) && !is_dir($dir_name)) {
-            mkdir($dir_name);
-        }
+            $local_file_dir = $dldir . '/' . $content;
+            $local_file_path = $local_file_dir . $content_name;
 
-        $is_file = isFile($list);
+            $remote_file_path = ftp_pwd($ftp) . $content . $content_name;
 
-        if ($is_file) {
-
-            $local_file_path = $dir_name . '/' . $list_second_half;
-
-            $file_path_if_pwd_root = ftp_pwd($ftp) . $list;
-            $file_path_if_pwd_isnt_root = ftp_pwd($ftp) . '/' . $list;
-            $remote_file_path = ftp_pwd($ftp) !== '/' ? $file_path_if_pwd_isnt_root : $file_path_if_pwd_root;
+            if (!file_exists($local_file_dir) && !is_dir($local_file_dir)) {
+                mkdir($local_file_dir, 0777, true);
+            }
 
             ftp_get($ftp, $local_file_path, $remote_file_path, FTP_BINARY);
         }
+        if ($isDirectory) { // if content is a directory, recursively call ftp_getzip to download its contents
 
-        if (!$is_file) {
+            $dir_name = ftp_get_content_name($item);
 
-            $copy_dir_name = $dir_name;
-            $dir_name = $dir_name . "/" . $list_second_half; // update dir_name
-
-            if (!file_exists($dir_name) && !is_dir($dir_name)) {
-
-                mkdir($dir_name);
-            }
-            ftp_chdir($ftp, $list_first_half); // go into one directory down in FTP server
-            ftp_getzip($ftp, $list_second_half, $dir_name);
-
-            ftp_chdir($ftp, '../'); // reset position in ftp server
-            $dir_name = $copy_dir_name; //reset dir_name
+            ftp_getzip($ftp, $content . $dir_name . '/', $dldir);
         }
     }
     return true;
@@ -68,18 +47,19 @@ function rrmdir($del_content_path) // function to delete temporarily downloaded 
     $lists = scandir($del_content_path);
 
     foreach ($lists as $list) {
-        $isFile = isFile($list);
+        $target_path = $del_content_path . "/" . $list;
+        $isFile = is_file($target_path);
 
         if ($isFile & $list !== '.' & $list !== '..') {
-            unlink($del_content_path . "/" . $list);
+            unlink($target_path); // delete file
         }
 
-        if (!$isFile) {
-            $nextDir = $del_content_path . "/" . $list;
+        if (!$isFile & $list !== '.' & $list !== '..') {
+            $nextDir = $target_path;
             rrmdir($nextDir);
         }
     }
-    rmdir($del_content_path); // delete empty directory
+    rmdir($del_content_path); // delete empty parent directory
     return;
 }
 
@@ -87,13 +67,12 @@ function getzip($ftp, $content, $dldir)
 {
     ftp_getzip($ftp, $content, $dldir);
 
-    $zip_filename = $content . ".zip";
+    $content_name = substr(str_replace('/', '_', $content), 0, -1); // replace forward slashes with underscores for zip file name
+    $zip_filename = $content_name . ".zip";
     $zip_filepath = "../../downloads" . "/" . $zip_filename;
 
     $command = 'cd ' . "../../downloads" . ";" . "zip -r " . $zip_filename . " " . $content;
     exec($command);
-
-    rrmdir($dldir); // delete downloaded content
 
     if (ob_get_level() > 0) {
         ob_end_clean();
@@ -105,21 +84,34 @@ function getzip($ftp, $content, $dldir)
     header('Content-Length: ' . filesize($zip_filepath));
 
     readfile($zip_filepath);
+    rrmdir($dldir); // delete downloaded content
     unlink($zip_filepath); // delete zip file
     exit();
 }
 
-$is_file = isFile($content_name);
+if (is_directory($content_name)) {
+    getzip($conn_id, $content_name, $download_dir);
+}
 
-if ($is_file) { // if content is a file
+if (!is_directory($content_name)) { // if content is a file
 
-    if (!file_exists($download_dir) && !is_dir($download_dir)) {
+    if (!file_exists($download_dir) && !is_dir($download_dir)) { // if download directory doesn't exist, create it
         mkdir($download_dir);
     }
 
-    if (ftp_get($conn_id, $download_file, $content_name, FTP_BINARY)) {
+    if (str_contains($content_name, '/')) { // if content is in a subdirectory, create the directory structure for the file
+        $remote_path = array_slice(explode('/', $content_name), 0, -1);
+        $dirpath = implode('/', $remote_path);
 
-        if (file_exists($download_file)) {
+        if (!file_exists($download_dir . '/' . $dirpath) && !is_dir($download_dir . '/' . $dirpath)) { //create the directory structure for the file
+            mkdir($download_dir . '/' . $dirpath, 0777, true);
+        }
+    }
+
+    $download_fullpath = $download_dir . '/' . $content_name; // Specify the local path to save the downloaded file
+    if (ftp_get($conn_id, $download_fullpath, $content_name, FTP_BINARY)) {
+
+        if (file_exists($download_fullpath)) {
             set_include_path('../../downloads/');
             header('Content-Type: application/octet-stream');
             header('Content-Disposition: attachment; filename="' . basename($content_name)  . '"');
@@ -129,8 +121,4 @@ if ($is_file) { // if content is a file
     } else {
         echo "could not download $content_name\n";
     }
-}
-
-if (!$is_file) {
-    getzip($conn_id, $content_name, $download_dir);
 }
