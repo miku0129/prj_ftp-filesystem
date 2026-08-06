@@ -121,15 +121,17 @@ if (isset($_POST['upload_submit_folder'])) {
                             if ($isDirectory) {
                                 $contents[$i] = $contentName . '/'; // Append a forward slash to indicate it's a directory
                                 $icon = '<i class="fa-solid fa-folder"></i>';
+                                $content_table = '<td class="border border-blue-500 px-4 py-2 font-medium "><div class="flex gap-2"><div class="place-self-center">' . $icon . '</div><a class="text-blue-700 underline px-4 py-2 block" href="./content.php?path=' . $contents[$i] . '">"' . $contents[$i] . '"</a></div></td>';
                             } else {
                                 $contents[$i] = $contentName; // It's a file, keep the name as is
                                 $icon = '<i class="fa-solid fa-file"></i>';
+                                $content_table = '<td class="border border-blue-500 px-4 py-2 font-medium"><div class="flex gap-2"><div class="place-self-center"><i class="fa-solid fa-file"></i></div>' . $contents[$i] . '</div></td>';
                             }
-                            echo '<tr>
-                                        <td class="border border-blue-500 px-4 py-2 font-medium "><div class="flex gap-2"><div class="place-self-center">' . $icon . '</div><a class="text-blue-700 underline px-4 py-2 block" href="./content.php?path=' . $contents[$i] . '">"' . $contents[$i] . '"</a></div></td>
-                                        <td class="border border-blue-500 px-4 py-2 font-medium"><a class="text-blue-700 underline px-4 py-2 block" href="./download.php?download_content=' . $contents[$i] . '" target="__blank"><div class="place-self-center"><i class="fa-solid fa-download"></i></div></a></td>
-                                        <td class="border border-blue-500 px-4 py-2 font-medium"><a class="text-blue-700 underline px-4 py-2 block" href="./delete.php?delete_content=' . $contents[$i] . '"><div class="place-self-center"><i class="fa-solid fa-trash"></i></div></a></td>
-                                    </tr>';
+                            echo '<tr>'
+                                . $content_table .
+                                    '<td class="border border-blue-500 px-4 py-2 font-medium"><a class="text-blue-700 underline px-4 py-2 block" href="./download.php?download_content=' . $contents[$i] . '" target="__blank"><div class="place-self-center"><i class="fa-solid fa-download"></i></div></a></td>
+                                    <td class="border border-blue-500 px-4 py-2 font-medium"><a class="text-blue-700 underline px-4 py-2 block" href="./delete.php?delete_content=' . $contents[$i] . '"><div class="place-self-center"><i class="fa-solid fa-trash"></i></div></a></td>
+                                </tr>';
                         }
                     }
                     ?>
