@@ -1,46 +1,38 @@
 <?php
-include('connectftp.php');
+include 'connectftp.php';
+include 'lib.php';
 
 // Get the content name from the query parameter
 $content_name = filter_input(INPUT_GET, 'delete_content', FILTER_UNSAFE_RAW);
 
-
-function isFile($content)
-{
-    return str_contains($content, '.');
-}
-
 function ftp_rrmdir($ftp, $dir)
 {
-    $lists = ftp_nlist($ftp, $dir); // get content list in the directory
+    $lists = ftp_rawlist($ftp, $dir); // get content list in the directory
 
     foreach ($lists as $list) {
 
-        $is_file = isFile($list);
+        $ftp_is_directory = ftp_is_directory($list);
 
-        // '.' exists -> it's a file so delete it
-        if ($is_file) {
-            ftp_raw($ftp, 'DELE ' . $list);
+        if ($ftp_is_directory) {
+            $content_name = ftp_get_content_name($list);
+            $next_dir = $dir . $content_name . '/';
+            ftp_rrmdir($ftp, $next_dir);
+            ftp_rmdir($ftp, $dir);
         }
 
-        // '.' isn't exists -> it's a directory so step down one below then call ftp_rrmdir recursively
-        if (!$is_file) {
-            $next_dir = explode('/', $list)[1];
-            ftp_chdir($ftp, $dir);
-            ftp_rrmdir($ftp, $next_dir);
-            ftp_chdir($ftp, '..'); // move back to the parent directory
-            if (ftp_nlist($ftp, $dir) === false) { // if the directory is empty, delete it
-                ftp_rmdir($ftp, $dir);
-            }
+        if (!$ftp_is_directory) {
+            $content_name = ftp_get_content_name($list);
+            $ftp_full_path = $dir . $content_name;
+            ftp_raw($ftp, 'DELE ' . $dir . $content_name);
         }
     }
     ftp_raw($ftp, 'RMD ' . $dir);
     return true;
 }
 
-$is_file = isFile($content_name);
+$is_directory = is_directory($content_name);
 
-if ($is_file) {
+if (!$is_directory) {
     if (ftp_delete($conn_id, $content_name)) {
         header('Location: /');
     } else {
@@ -48,7 +40,7 @@ if ($is_file) {
     }
 }
 
-if (!$is_file) {
+if ($is_directory) {
     if (ftp_rrmdir($conn_id, $content_name)) {
         header('Location: /');
     } else {
