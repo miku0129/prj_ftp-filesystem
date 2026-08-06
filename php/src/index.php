@@ -61,7 +61,7 @@ if (isset($_POST['upload_submit_folder'])) {
 </head>
 
 <body>
-    <div class="grid grid-cols-4 gap-4 my-10 mx-10">
+    <div class="flex flex-col xl:grid xl:grid-cols-4 gap-4 my-10 mx-10">
         <form class="mb-5" action="<?php echo $_SERVER['PHP_SELF']; ?>" id="upload_form" method="post"
             enctype="multipart/form-data">
 
