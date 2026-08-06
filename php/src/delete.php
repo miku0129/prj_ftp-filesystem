@@ -17,13 +17,12 @@ function ftp_rrmdir($ftp, $dir)
             $content_name = ftp_get_content_name($list);
             $next_dir = $dir . $content_name . '/';
             ftp_rrmdir($ftp, $next_dir);
-            ftp_rmdir($ftp, $dir);
         }
 
         if (!$ftp_is_directory) {
             $content_name = ftp_get_content_name($list);
             $ftp_full_path = $dir . $content_name;
-            ftp_raw($ftp, 'DELE ' . $dir . $content_name);
+            ftp_raw($ftp, 'DELE ' . $ftp_full_path);
         }
     }
     ftp_raw($ftp, 'RMD ' . $dir);
