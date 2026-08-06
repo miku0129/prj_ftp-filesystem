@@ -26,14 +26,15 @@ include 'lib.php'; // Include the library file for FTP functions
 
         <div class="col-span-3 overflow-auto py-3 mt-8">
             <?php
+            // Create bread crumbs
             $path = $_GET['path'] ?? '/';
             $path_str = 'href="/content.php?path=';
             $path_array = explode('/', $path);
             $bread_curumbs = '';
             foreach ($path_array as $path_par) {
                 if (!empty($path_par)) {
-                    $skip_str = reset($path_array);
-                    $bread_curumbs = $bread_curumbs . '>' . '<a class="text-lg text-blue-700 underline px-3 block"' . $path_str . '">' . $path_par . '</a>';
+                    $path_str = ($path_str . $path_par . '/');
+                    $bread_curumbs = $bread_curumbs . '>' . '<a class="text-lg text-blue-700 underline px-3 block" ' . $path_str . '">' . $path_par . '</a>';
                 }
             }
             echo '<div class="flex flex-row"><div class="place-self-center px-3"><a class="text-lg text-blue-700 underline block" href="./index.php"><i class="fa-solid fa-folder-open"></i></a></div>' . $bread_curumbs . '</div>';
