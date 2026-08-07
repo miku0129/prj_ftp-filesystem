@@ -14,7 +14,7 @@ services:
    ftp-server: 
       container_name: my-ftp-server
       environment:
-        - PUBLIC_IP=192.168.0.1
+        - PUBLIC_IP=127.0.0.1 # For passive mode
         - FTP_PASS=123
         - FTP_USER=user
       image: garethflowers/ftp-server
