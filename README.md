@@ -2,6 +2,16 @@
 
 This is a sample ftp file management application built for learning purposes.
 
+# Feature
+- Upload contents
+- Download contents
+- Delete contents
+
+<img width="700" alt="FireShot Capture 204 - Home -  localhost" src="https://github.com/user-attachments/assets/a2af8206-448b-4aef-b56a-08a0e8524031" />
+
+<img width="700" alt="FireShot Capture 206 - Content -  localhost" src="https://github.com/user-attachments/assets/606af378-c432-4881-8720-933bf19ca5ff" />
+
+# Setup 
 ## Pre-Requisites
 
 - Docker
