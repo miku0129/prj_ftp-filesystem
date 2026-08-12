@@ -62,8 +62,8 @@ if (isset($_POST['upload_submit_folder'])) {
     <script src="./public/bootstrap.bundle.min.js"></script>
 </head>
 
-<body>
-    <div class="flex flex-col xl:grid xl:grid-cols-5 gap-4 my-10 mx-10">
+<body class="h-screen">
+    <div class="h-full flex flex-col xl:grid xl:grid-cols-5 gap-4 my-10 mx-10">
         <div>
             <button class="btn btn-primary btn-primary btn-lg" type="button" data-bs-toggle="offcanvas"
                 data-bs-target="#offcanvasMenu" aria-controls="offcanvasMenu">
@@ -117,44 +117,41 @@ if (isset($_POST['upload_submit_folder'])) {
             </div>
         </div>
         <div class="col-span-4 overflow-auto py-3 mt-8">
-            <table class="table-auto w-full">
-                <thead>
-                    <tr>
-                        <th class="border border-blue-500 px-4 py-2 text-blue-500">Content</th>
-                        <th class="border border-blue-500 px-4 py-2 text-blue-500">Download</th>
-                        <th class="border border-blue-500 px-4 py-2 text-blue-500">Delete</th>
-                    </tr>
-                </thead>
-                <tbody>
+            <?php
+            $contents = ftp_rawlist($conn_id, ".");
 
-                    <?php
-                    $contents = ftp_rawlist($conn_id, ".");
+            if ($contents) {
+                for ($i = 0; $i < count($contents); $i++) {
+                    $isDirectory = ftp_is_directory($contents[$i]);
+                    $contentName = ftp_get_content_name($contents[$i]);
+                    $icon = '';
 
-                    if ($contents) {
-                        for ($i = 0; $i < count($contents); $i++) {
-                            $isDirectory = ftp_is_directory($contents[$i]);
-                            $contentName = ftp_get_content_name($contents[$i]);
-                            $icon = '';
-
-                            if ($isDirectory) {
-                                $contents[$i] = $contentName . '/'; // Append a forward slash to indicate it's a directory
-                                $icon = '<i class="fa-solid fa-folder"></i>';
-                                $content_table = '<td class="border border-blue-500 px-4 py-2 font-medium "><div class="flex gap-2"><div class="place-self-center">' . $icon . '</div><a class="text-blue-700 underline px-4 py-2 block" href="./content.php?path=' . $contents[$i] . '">"' . $contents[$i] . '"</a></div></td>';
-                            } else {
-                                $contents[$i] = $contentName; // It's a file, keep the name as is
-                                $icon = '<i class="fa-solid fa-file"></i>';
-                                $content_table = '<td class="border border-blue-500 px-4 py-2 font-medium"><div class="flex gap-2"><div class="place-self-center"><i class="fa-solid fa-file"></i></div>' . $contents[$i] . '</div></td>';
-                            }
-                            echo '<tr>'
-                                . $content_table .
-                                '<td class="border border-blue-500 px-4 py-2 font-medium"><a class="text-blue-700 underline px-4 py-2 block" href="./download.php?download_content=' . $contents[$i] . '" target="__blank"><div class="place-self-center"><i class="fa-solid fa-download"></i></div></a></td>
-                                    <td class="border border-blue-500 px-4 py-2 font-medium"><a class="text-blue-700 underline px-4 py-2 block" href="./delete.php?delete_content=' . $contents[$i] . '"><div class="place-self-center"><i class="fa-solid fa-trash"></i></div></a></td>
-                                </tr>';
-                        }
+                    if ($isDirectory) {
+                        $contents[$i] = $contentName . '/'; // Append a forward slash to indicate it's a directory
+                        $icon = '<i class="fa-solid fa-folder"></i>';
+                        $content_table = '<div class="px-4 py-2 font-medium "><div class="flex gap-4"><div class="place-self-center">' . $icon . '</div><a class="text-blue-700 underline block" href="./content.php?path=' . $contents[$i] . '">"' . $contents[$i] . '"</a></div></div>';
+                    } else {
+                        $contents[$i] = $contentName; // It's a file, keep the name as is
+                        $icon = '<i class="fa-solid fa-file"></i>';
+                        $content_table = '<div class="px-4 py-2 font-medium"><div class="flex gap-4"><div class="place-self-center">'. $icon . '</i></div>' . $contents[$i] . '</div></div>';
                     }
-                    ?>
-                </tbody>
-            </table>
+                    echo '<div class="flex justify-between border-b-2 border-gray-300">'
+                        . $content_table .
+                        '<div class="flex">
+                                    <div class="dropdown place-self-center">
+                                        <button class="btn btn-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="text-blue-700 underline px-4 py-2 block" href="./download.php?download_content=' . $contents[$i] . '" target="__blank"><div class="place-self-end"><i class="fa-solid fa-download"></i> Download</div></a></li>
+                                            <li><a class="text-blue-700 underline px-4 py-2 block" href="./delete.php?delete_content=' . $contents[$i] . '"><div class="place-self-end"><i class="fa-solid fa-trash"></i> Delete</div></a></li>
+                                        </ul>
+                                    </div>
+                                </div>' .
+                        '</div>';
+                }
+            }
+            ?>
         </div>
     </div>
 
