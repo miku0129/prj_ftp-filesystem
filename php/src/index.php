@@ -56,49 +56,67 @@ if (isset($_POST['upload_submit_folder'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
-    <link href="./public/styles.css" rel="stylesheet">
+    <link href="./public/tailwind.css" rel="stylesheet">
+    <link href="./public/scoped-bootstrap.css" rel="stylesheet">
     <link href="https://use.fontawesome.com/releases/v7.3.1/css/all.css" rel="stylesheet">
+    <script src="./public/bootstrap.bundle.min.js"></script>
 </head>
 
 <body>
-    <div class="flex flex-col xl:grid xl:grid-cols-4 gap-4 my-10 mx-10">
-        <form class="mb-5" action="<?php echo $_SERVER['PHP_SELF']; ?>" id="upload_form" method="post"
-            enctype="multipart/form-data">
+    <div class="flex flex-col xl:grid xl:grid-cols-5 gap-4 my-10 mx-10">
+        <div>
+            <button class="btn btn-primary btn-primary btn-lg" type="button" data-bs-toggle="offcanvas"
+                data-bs-target="#offcanvasMenu" aria-controls="offcanvasMenu">
+                + new
+            </button>
+        </div>
 
-            <div>
-                <div class="flex flex-row gap-2">
-                    <div class="place-self-center"><i class="fa-solid fa-file"></i></div>
-                    <p class="text-lg text-blue-500">Upload a new file</p>
-                </div>
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenuLabel">
+            <div class="offcanvas-header">
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <div>
+                    <form class="mb-5" action="<?php echo $_SERVER['PHP_SELF']; ?>" id="upload_form" method="post"
+                        enctype="multipart/form-data">
 
-                <input class="text-sm text-stone-500 mt-3 file:mr-3 file:py-1 file:px-3 file:border-[1px]
+                        <div>
+                            <div class="flex flex-row gap-2">
+                                <div class="place-self-center"><i class="fa-solid fa-file"></i></div>
+                                <span class="text-lg text-blue-500 inline-block align-middle">Upload a new file</span>
+                            </div>
+
+                            <input class="text-sm text-stone-500 mt-3 file:mr-3 file:py-1 file:px-3 file:border-[1px]
                     file:bg-stone-50 file:text-stone-700
                     hover:file:cursor-pointer hover:file:bg-blue-50
                     hover:file:text-blue-700 block" type="file" id="file" name="file" />
 
-                <input class="text-sm text-stone-500 mt-3 py-1 px-3 border-[1px]
+                            <input class="text-sm text-stone-500 mt-3 py-1 px-3 border-[1px]
                     hover:cursor-pointer hover:bg-blue-50
                     hover:text-blue-700 block" type="submit" name="upload_submit_file" value="Upload" />
-            </div>
-            <div class="mt-10">
-                <div class="flex flex-row gap-2">
-                    <div class="place-self-center"><i class="fa-solid fa-folder"></i></div>
-                    <p class="text-lg text-blue-500">Upload a new folder</p>
-                </div>
+                        </div>
+                        <div class="mt-10">
+                            <div class="flex flex-row gap-2">
+                                <div class="place-self-center"><i class="fa-solid fa-folder"></i></div>
+                                <span class="text-lg text-blue-500 inline-block align-middle">Upload a new folder</span>
+                            </div>
 
-                <input class="text-sm text-stone-500 mt-3 file:mr-3 file:py-1 file:px-3 file:border-[1px]
+                            <input class="text-sm text-stone-500 mt-3 file:mr-3 file:py-1 file:px-3 file:border-[1px]
                     file:bg-stone-50 file:text-stone-700
                     hover:file:cursor-pointer hover:file:bg-blue-50
                     hover:file:text-blue-700 block" type="file" id="file" name="files[]" webkitdirectory multiple />
 
-                <input class="text-sm text-stone-500 mt-3 py-1 px-3 border-[1px]
+                            <input class="text-sm text-stone-500 mt-3 py-1 px-3 border-[1px]
                     hover:cursor-pointer hover:bg-blue-50
                     hover:text-blue-700 block" type="submit" name="upload_submit_folder" value="Upload" />
+                        </div>
+
+                    </form>
+
+                </div>
             </div>
-
-        </form>
-
-        <div class="col-span-3 overflow-auto py-3 mt-8">
+        </div>
+        <div class="col-span-4 overflow-auto py-3 mt-8">
             <table class="table-auto w-full">
                 <thead>
                     <tr>
@@ -129,7 +147,7 @@ if (isset($_POST['upload_submit_folder'])) {
                             }
                             echo '<tr>'
                                 . $content_table .
-                                    '<td class="border border-blue-500 px-4 py-2 font-medium"><a class="text-blue-700 underline px-4 py-2 block" href="./download.php?download_content=' . $contents[$i] . '" target="__blank"><div class="place-self-center"><i class="fa-solid fa-download"></i></div></a></td>
+                                '<td class="border border-blue-500 px-4 py-2 font-medium"><a class="text-blue-700 underline px-4 py-2 block" href="./download.php?download_content=' . $contents[$i] . '" target="__blank"><div class="place-self-center"><i class="fa-solid fa-download"></i></div></a></td>
                                     <td class="border border-blue-500 px-4 py-2 font-medium"><a class="text-blue-700 underline px-4 py-2 block" href="./delete.php?delete_content=' . $contents[$i] . '"><div class="place-self-center"><i class="fa-solid fa-trash"></i></div></a></td>
                                 </tr>';
                         }
@@ -139,6 +157,7 @@ if (isset($_POST['upload_submit_folder'])) {
             </table>
         </div>
     </div>
+
 </body>
 
 </html>
