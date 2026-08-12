@@ -64,7 +64,10 @@ if (isset($_POST['upload_submit_folder'])) {
 
 <body class="h-screen">
     <div class="h-full flex flex-col xl:grid xl:grid-cols-5 gap-4 my-10 mx-10">
+
         <div>
+            <a class="text-xl text-blue-700 block mb-4" href="./index.php"><i class="fa-solid fa-house"></i> Home</a>
+
             <button class="btn btn-primary btn-primary btn-lg" type="button" data-bs-toggle="offcanvas"
                 data-bs-target="#offcanvasMenu" aria-controls="offcanvasMenu">
                 + new
@@ -133,7 +136,7 @@ if (isset($_POST['upload_submit_folder'])) {
                     } else {
                         $contents[$i] = $contentName; // It's a file, keep the name as is
                         $icon = '<i class="fa-solid fa-file"></i>';
-                        $content_table = '<div class="px-4 py-2 font-medium"><div class="flex gap-4"><div class="place-self-center">'. $icon . '</i></div>' . $contents[$i] . '</div></div>';
+                        $content_table = '<div class="px-4 py-2 font-medium"><div class="flex gap-4"><div class="place-self-center">' . $icon . '</i></div>' . $contents[$i] . '</div></div>';
                     }
                     echo '<div class="flex justify-between border-b-2 border-gray-300">'
                         . $content_table .
