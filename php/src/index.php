@@ -55,6 +55,7 @@ if (isset($_POST['upload_submit_folder'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/public/favicon.ico"/>
     <title>Home</title>
     <link href="./public/tailwind.css" rel="stylesheet">
     <link href="./public/scoped-bootstrap.css" rel="stylesheet">
@@ -66,9 +67,13 @@ if (isset($_POST['upload_submit_folder'])) {
     <div class="h-full flex flex-col xl:grid xl:grid-cols-5 gap-4 my-10 mx-10">
 
         <div>
-            <a class="text-xl text-blue-700 block mb-4" href="./index.php"><i class="fa-solid fa-house"></i> Home</a>
+            <div class="my-4">
+                <a class="flex gap-3 no-underline" href="./index.php">
+                    <img alt="logo of the association" src='./public/taigas.webp' width='50px'><div class="place-self-center"><span class="text-3xl inline-block align-middle"> Home</span></div>
+                </a>
+            </div>
 
-            <button class="btn btn-primary btn-primary btn-lg" type="button" data-bs-toggle="offcanvas"
+            <button class="btn btn-light btn-primary btn-lg shadow-sm" type="button" data-bs-toggle="offcanvas"
                 data-bs-target="#offcanvasMenu" aria-controls="offcanvasMenu">
                 + new
             </button>
