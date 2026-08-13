@@ -4,7 +4,9 @@
   "description": "This is a ftp file-management application built for demo purposes.",
   "main": "index.php",
   "scripts": {
-    "build:css": "npx @tailwindcss/cli -i php/src/styles/styles.css -o php/src/public/styles.css --watch",
+    "build:tailwind": "npx @tailwindcss/cli -i php/src/styles/tailwind.css -o php/src/public/tailwind.css --watch",
+    "build:bootstrap:css": "npx postcss php/src/styles/bootstrap.css -o php/src/public/scoped-bootstrap.css",
+    "build:bootstrap:js": "cp node_modules/bootstrap/dist/js/bootstrap.bundle.min.js php/src/public",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -13,6 +15,13 @@
   "type": "commonjs",
   "dependencies": {
     "@tailwindcss/cli": "^4.3.1",
+    "bootstrap": "^5.3.8",
     "tailwindcss": "^4.3.1"
+  },
+  "devDependencies": {
+    "postcss": "^8.5.26",
+    "postcss-cli": "^11.0.1",
+    "postcss-import": "^16.1.1",
+    "postcss-prefixwrap": "^1.58.0"
   }
 }
