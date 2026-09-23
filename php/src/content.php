@@ -9,7 +9,8 @@ include 'lib.php'; // Include the library file for FTP functions
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Content</title>
+    <link rel="icon" type="image/png" href="/public/favicon.ico" />
+    <title>TAIGAS | Content</title>
     <link href="./public/tailwind.css" rel="stylesheet">
     <link href="./public/scoped-bootstrap.css" rel="stylesheet">
     <link href="https://use.fontawesome.com/releases/v7.3.1/css/all.css" rel="stylesheet">
@@ -19,7 +20,21 @@ include 'lib.php'; // Include the library file for FTP functions
 <body class="h-screen">
     <div class="h-full flex flex-col xl:grid xl:grid-cols-5 gap-4 my-10 mx-10">
 
-        <a class="text-xl text-blue-700 block mb-4" href="./index.php"><i class="fa-solid fa-house"></i> Home</a>
+        <div>
+            <div class="my-4">
+                <a class="flex gap-3 no-underline" href="./index.php">
+                    <img alt="logo of the association" src='./public/taigas.webp' width='50px'>
+                    <div class="place-self-center"><span class="text-3xl inline-block align-middle"> TAIGAS</span></div>
+                </a>
+            </div>
+
+            <button class="btn btn-light btn-primary btn-lg shadow-sm" type="button" data-bs-toggle="offcanvas"
+                data-bs-target="#offcanvasMenu" aria-controls="offcanvasMenu">
+                + new
+            </button>
+        </div>
+
+        <?php require_once __DIR__ . '/components/offcanvas-upload-form.php' ?>
 
         <div class="col-span-4 overflow-auto py-3 mt-8">
             <?php
@@ -35,7 +50,7 @@ include 'lib.php'; // Include the library file for FTP functions
                     $bread_curumbs = $bread_curumbs . $icon . '<a class="text-lg text-blue-700 underline block" ' . $path_str . '">' . $path_par . '</a>';
                 }
             }
-            echo '<div class="flex flex-row gap-4 mb-4"><div class="place-self-center"><a class="text-lg text-blue-700 underline block" href="./index.php"><i class="fa-solid fa-folder-open"></i></a></div>' . $bread_curumbs . '</div>';
+            echo '<div class="flex flex-row gap-4 px-4 mb-4"><div class="place-self-center"><a class="text-lg text-blue-700 underline block" href="./index.php"><i class="fa-solid fa-folder-open"></i></a></div>' . $bread_curumbs . '</div>';
             ?>
             <?php
             $path = $_GET['path'] ?? '/'; // Get the path from the query parameter, default to root if not set

@@ -37,12 +37,17 @@
             id="file"
             name="file"
           />
-
           <input
             class="text-sm text-stone-500 mt-3 py-1 px-3 border-[1px] hover:cursor-pointer hover:bg-blue-50 hover:text-blue-700 block"
             type="submit"
             name="upload_submit_file"
-            value="Upload"
+          />
+
+          <!-- hidden input to store the previous page URI -->
+          <input 
+          type="hidden"
+          name="previous_page_uri"
+          value="<?php echo htmlspecialchars($_SERVER['REQUEST_URI'], ENT_QUOTES, 'UTF-8'); ?>"
           />
         </div>
         <div class="mt-10">
@@ -63,13 +68,18 @@
             webkitdirectory
             multiple
           />
-
           <input
-            class="text-sm text-stone-500 mt-3 py-1 px-3 border-[1px] hover:cursor-pointer hover:bg-blue-50 hover:text-blue-700 block"
-            type="submit"
-            name="upload_submit_folder"
-            value="Upload"
+          class="text-sm text-stone-500 mt-3 py-1 px-3 border-[1px] hover:cursor-pointer hover:bg-blue-50 hover:text-blue-700 block"
+          type="submit"
+          name="upload_submit_folder"
           />
+          
+          <!-- hidden input to store the previous page URI -->
+         <input 
+         type="hidden"
+         name="previous_page_uri"
+         value="<?php echo htmlspecialchars($_SERVER['REQUEST_URI'], ENT_QUOTES, 'UTF-8'); ?>"
+         />
         </div>
       </form>
 
